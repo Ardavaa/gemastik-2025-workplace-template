@@ -1,0 +1,73 @@
+
+TUTORIAL LENGKAP PENGGUNAAN GOOGLE MEET
+========================================
+
+1. MEMBUKA GOOGLE MEET
+------------------------
+1. Kunjungi https://meet.google.com
+2. Atau buka melalui Gmail > Klik ikon Google Apps > Pilih "Meet"
+
+2. MEMULAI RAPAT BARU
+-----------------------
+1. Klik tombol “Rapat baru” (New meeting)
+2. Pilih salah satu opsi:
+   - Buat rapat untuk nanti (Generate link)
+   - Mulai rapat sekarang
+   - Jadwalkan di Google Kalender
+
+3. MENGGABUNG KE RAPAT
+------------------------
+1. Masukkan kode rapat/link di kolom “Masukkan kode atau tautan”
+2. Klik “Gabung” (Join)
+
+4. MENGGUNAKAN FITUR DI DALAM RAPAT
+-------------------------------------
+- 🎤 Mikrofon: Klik ikon mikrofon untuk mute/unmute
+- 📷 Kamera: Klik ikon kamera untuk on/off video
+- 🎥 Bagikan Layar:
+  1. Klik ikon “Presentasikan sekarang”
+  2. Pilih salah satu:
+     - Seluruh layar
+     - Jendela aplikasi
+     - Tab Chrome
+- 💬 Chat: Klik ikon chat untuk membuka kolom percakapan
+- 👤 Daftar peserta: Klik ikon orang untuk melihat peserta
+- 🎛️ Reaksi & Emoji: Klik ikon senyum/reaksi untuk mengekspresikan diri
+
+5. MENGATUR TAMPILAN
+----------------------
+- Klik ikon tiga titik (⋮) di kanan bawah
+- Pilih “Ubah tata letak” untuk mengatur tampilan (grid, spotlight, dll)
+
+6. MEREKAM RAPAT (JIKA DIZINKAN)
+----------------------------------
+1. Klik ikon tiga titik (⋮)
+2. Pilih “Rekam rapat”
+3. Setelah selesai, klik “Hentikan rekaman”
+4. File akan otomatis tersimpan di Google Drive penyelenggara
+
+7. FITUR LANJUTAN
+-------------------
+- **Subtitel Otomatis (CC):** Klik ikon CC untuk mengaktifkan subtitle
+- **Pemutaran Video Bersama (berbagi tab):** Gunakan fitur present tab + share audio
+- **Mode latar belakang blur/ubah:** Klik ikon tiga titik > “Terapkan efek visual”
+
+8. MENGAKHIRI ATAU KELUAR DARI RAPAT
+-------------------------------------
+- Klik ikon telepon merah untuk keluar
+- Jika kamu penyelenggara, kamu bisa “Akhiri rapat untuk semua”
+
+9. MENGGUNAKAN GOOGLE MEET DI HP
+----------------------------------
+1. Unduh aplikasi “Google Meet” dari Play Store / App Store
+2. Login menggunakan akun Google
+3. Gunakan tombol “Rapat Baru” atau “Gabung dengan kode”
+
+10. TIPS TAMBAHAN
+-------------------
+- Gunakan headset untuk kualitas audio lebih baik
+- Pastikan koneksi internet stabil
+- Gunakan background netral atau blur untuk fokus
+- Gunakan Google Kalender untuk menjadwalkan dan mengirim undangan rapat
+
+Selesai! Sekarang kamu siap menggunakan Google Meet untuk belajar, rapat, atau diskusi dengan lebih efektif.

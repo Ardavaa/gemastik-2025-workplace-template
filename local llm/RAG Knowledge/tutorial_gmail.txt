@@ -1,0 +1,83 @@
+
+TUTORIAL LENGKAP PENGGUNAAN GMAIL
+==================================
+
+1. MEMBUAT AKUN GMAIL
+----------------------
+1. Buka https://mail.google.com atau https://accounts.google.com/signup
+2. Klik “Buat akun”.
+3. Pilih “Untuk diri sendiri” atau “Untuk bisnis”.
+4. Masukkan:
+   - Nama depan dan belakang
+   - Alamat email yang diinginkan
+   - Kata sandi dan konfirmasi kata sandi
+5. Klik “Berikutnya”, lalu isi informasi seperti nomor HP dan email pemulihan.
+6. Ikuti petunjuk verifikasi dan selesaikan proses pendaftaran.
+
+2. MASUK KE GMAIL
+-------------------
+1. Kunjungi https://mail.google.com.
+2. Masukkan alamat email dan kata sandi.
+3. Klik “Masuk”.
+
+3. MENGIRIM EMAIL
+-------------------
+1. Klik tombol “Tulis”.
+2. Isi kolom:
+   - Kepada (To)
+   - Subjek
+   - Isi email
+3. Untuk melampirkan file: klik ikon penjepit (📎)
+4. Klik “Kirim”.
+
+4. MENGELOLA EMAIL MASUK
+-------------------------
+- Balas email: Klik “Balas”
+- Teruskan: Klik “Teruskan”
+- Hapus: Klik ikon tempat sampah
+- Arsipkan: Klik ikon arsip
+- Tandai penting: Klik ikon bintang
+
+5. MENGGUNAKAN LABEL
+---------------------
+- Klik ikon label di atas email untuk menambahkan label.
+- Membuat label baru:
+  1. Scroll sidebar kiri
+  2. Klik “Lainnya” > “Buat label baru”
+
+6. PENCARIAN & FILTER
+----------------------
+- Gunakan kolom pencarian di atas
+- Klik ikon segitiga kecil di kolom pencarian untuk pencarian lanjutan dan membuat filter otomatis.
+
+7. TANDA TANGAN OTOMATIS
+-------------------------
+1. Klik ikon roda gigi ⚙️ > “Lihat semua setelan”
+2. Masuk ke tab “Umum”
+3. Scroll ke “Tanda tangan” > “Buat baru”
+4. Masukkan informasi tanda tangan
+5. Atur agar muncul otomatis
+
+8. KEAMANAN & PRIVASI
+-----------------------
+- Ganti kata sandi dan atur keamanan akun di https://myaccount.google.com/security
+- Aktifkan Verifikasi 2 Langkah (2FA)
+
+9. GMAIL DI HP (Android/iOS)
+------------------------------
+1. Unduh aplikasi Gmail dari Play Store / App Store
+2. Login dengan akun Gmail
+3. Gunakan fitur: tulis, hapus, arsip, notifikasi, swipe action
+
+10. FITUR TAMBAHAN
+--------------------
+- Undo Send: Batalkan pengiriman dalam beberapa detik
+- Mode Rahasia: Kirim email dengan tanggal kadaluarsa
+- Jadwal Kirim: Klik panah bawah di tombol “Kirim” > “Jadwalkan pengiriman”
+
+11. TEMA GMAIL
+---------------
+1. Klik ikon roda gigi ⚙️ > “Tema”
+2. Pilih gambar atau warna latar
+
+Selesai! Selamat menggunakan Gmail dengan lebih produktif.

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPIL Helper</title>
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat font Inter dari Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Mengatur font utama dan beberapa style tambahan untuk scrollbar dan preview gambar */
+        body { font-family: 'Inter', sans-serif; }
+        #chat-container::-webkit-scrollbar { width: 6px; }
+        #chat-container::-webkit-scrollbar-track { background: #f1f5f9; } /* slate-100 */
+        #chat-container::-webkit-scrollbar-thumb { background-color: #8DC63F; border-radius: 20px; }
+        #image-preview-container { position: relative; }
+        #remove-image-btn {
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+            background-color: rgba(0,0,0,0.7);
+            border-radius: 9999px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.5rem;
+            height: 1.5rem;
+            color: white;
+            border: 1px solid white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <!-- Kontainer utama chat -->
+    <div class="w-full max-w-2xl h-[85vh] flex flex-col bg-white rounded-xl shadow-2xl border border-gray-200">
+        <!-- Header -->
+        <div class="p-4 border-b border-gray-200">
+            <h1 class="text-xl font-bold text-center text-[#E5004D]">SPIL HELPER</h1>
+            <p class="text-sm text-center text-gray-500">Tanyakan saja apapun tentang App SPIL</p>
+        </div>
+
+        <!-- Kontainer untuk menampilkan pesan chat -->
+        <div id="chat-container" class="flex-1 p-4 overflow-y-auto space-y-4">
+            <!-- Pesan sambutan awal -->
+            <div class="flex justify-start">
+                <div class="bg-gray-200 rounded-lg p-3 max-w-lg">
+                    <p class="text-sm">Halo! Anda bisa bertanya tentang semua produk spil.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form untuk input pesan dan gambar -->
+        <div class="p-4 border-t border-gray-200 bg-white rounded-b-xl">
+            <!-- Kontainer untuk pratinjau gambar yang akan diunggah -->
+            <div id="image-preview-container" class="mb-2 hidden">
+                <img id="image-preview" class="max-h-24 rounded-lg" alt="Pratinjau Gambar">
+                <button id="remove-image-btn" title="Hapus Gambar">&times;</button>
+            </div>
+            <!-- Form input -->
+            <form id="chat-form" class="flex items-center space-x-3">
+                <input type="file" id="image-input" accept="image/*" class="hidden">
+                <!-- Tombol untuk memilih gambar -->
+                <label for="image-input" class="p-2 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </label>
+                <!-- Input teks untuk pesan -->
+                <input type="text" id="chat-input" placeholder="Ketik pesan atau lampirkan gambar..." class="flex-1 bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#8DC63F] text-gray-900" autocomplete="off">
+                <!-- Tombol kirim -->
+                <button type="submit" id="submit-button" class="bg-[#8DC63F] hover:bg-[#7cb538] text-white font-semibold rounded-lg px-4 py-2 transition-colors duration-200 flex items-center">
+                    <span>Kirim</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal untuk menampilkan video -->
+    <div id="video-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl aspect-video relative m-4">
+            <button id="close-modal" class="absolute -top-3 -right-3 bg-red-600 hover:bg-red-700 text-white rounded-full h-8 w-8 flex items-center justify-center z-10">&times;</button>
+            <iframe id="video-iframe" class="w-full h-full rounded-lg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Mengambil elemen-elemen dari DOM
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatContainer = document.getElementById('chat-container');
+        const submitButton = document.getElementById('submit-button');
+        const imageInput = document.getElementById('image-input');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const removeImageBtn = document.getElementById('remove-image-btn');
+        
+        const videoModal = document.getElementById('video-modal');
+        const videoIframe = document.getElementById('video-iframe');
+        const closeModalButton = document.getElementById('close-modal');
+
+        // URL endpoint backend Flask Anda
+        const API_URL = 'http://127.0.0.1:5000/chat';
+        let imageDataBase64 = null;
+
+        // Menambahkan event listeners
+        chatForm.addEventListener('submit', handleSendMessage);
+        imageInput.addEventListener('change', handleImageSelection);
+        removeImageBtn.addEventListener('click', clearImagePreview);
+        closeModalButton.addEventListener('click', closeModal);
+        // Tambahkan event listener untuk paste (Ctrl+V)
+        document.addEventListener('paste', handlePaste);
+
+
+        // Fungsi untuk menangani gambar yang di-paste
+        function handlePaste(event) {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (const item of items) {
+                if (item.kind === 'file' && item.type.startsWith('image/')) {
+                    const file = item.getAsFile();
+                    if (file) {
+                        displayImagePreview(file);
+                        // Mencegah browser melakukan aksi paste default (misal: menampilkan gambar di tab baru)
+                        event.preventDefault(); 
+                    }
+                    break; // Hanya proses gambar pertama yang ditemukan
+                }
+            }
+        }
+
+        // Fungsi untuk menangani pemilihan gambar dari input file
+        function handleImageSelection(event) {
+            const file = event.target.files[0];
+            if (file) {
+                displayImagePreview(file);
+            }
+        }
+
+        // Fungsi terpusat untuk menampilkan pratinjau gambar dan mengkonversi ke base64
+        function displayImagePreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreviewContainer.classList.remove('hidden');
+                // Ekstrak data base64 dari hasil reader
+                imageDataBase64 = e.target.result.split(',')[1];
+            }
+            reader.readAsDataURL(file);
+        }
+
+
+        // Fungsi untuk membersihkan pratinjau gambar
+        function clearImagePreview() {
+            imageInput.value = ''; // Reset input file
+            imagePreview.src = '';
+            imagePreviewContainer.classList.add('hidden');
+            imageDataBase64 = null;
+        }
+
+        // Fungsi utama untuk mengirim pesan ke backend
+        async function handleSendMessage(e) {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (!message && !imageDataBase64) return; // Jangan kirim jika input kosong
+
+            // Tampilkan pesan pengguna di UI
+            appendMessage(message, 'user', imageDataBase64 ? imagePreview.src : null);
+            
+            // Siapkan payload untuk dikirim ke backend
+            const payload = {
+                message: message,
+                image: imageDataBase64
+            };
+            
+            // Reset input setelah data diambil
+            chatInput.value = '';
+            clearImagePreview();
+            
+            setLoadingState(true);
+
+            try {
+                // Kirim request ke backend
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                appendMessage(data.response, 'bot');
+                checkForVideoLink(data.response);
+
+            } catch (error) {
+                console.error('Error fetching bot response:', error);
+                appendMessage(`Gagal terhubung ke server: ${error.message}.`, 'bot-error');
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        // Fungsi untuk mengatur status loading (menonaktifkan input saat menunggu)
+        function setLoadingState(isLoading) {
+            chatInput.disabled = isLoading;
+            submitButton.disabled = isLoading;
+            if (isLoading) {
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+                appendTypingIndicator();
+            } else {
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                removeTypingIndicator();
+            }
+        }
+
+        // Fungsi untuk menambahkan pesan ke jendela chat
+        function appendMessage(message, sender, imgSrc = null) {
+            removeTypingIndicator();
+            const messageWrapper = document.createElement('div');
+            messageWrapper.classList.add('flex', 'flex-col');
+
+            const messageBubble = document.createElement('div');
+            messageBubble.classList.add('rounded-lg', 'p-3', 'max-w-lg', 'w-fit');
+            
+            // Tambahkan elemen gambar jika ada
+            if (imgSrc) {
+                const imgElement = document.createElement('img');
+                imgElement.src = imgSrc;
+                imgElement.classList.add('rounded-lg', 'max-w-xs', 'mb-2');
+                messageBubble.appendChild(imgElement);
+            }
+            
+            // Tambahkan elemen teks jika ada
+            if (message) {
+                const textElement = document.createElement('p');
+                textElement.classList.add('text-sm');
+                // Ganti newline character dengan tag <br> untuk tampilan di HTML
+                textElement.innerHTML = message.replace(/\n/g, '<br>');
+                messageBubble.appendChild(textElement);
+            }
+
+            // Atur style berdasarkan pengirim (user atau bot)
+            if (sender === 'user') {
+                messageWrapper.classList.add('items-end');
+                messageBubble.classList.add('bg-[#8DC63F]', 'text-white');
+            } else if (sender === 'bot-error') {
+                messageWrapper.classList.add('items-start');
+                messageBubble.classList.add('bg-red-100', 'text-red-700');
+            } else { // bot
+                messageWrapper.classList.add('items-start');
+                messageBubble.classList.add('bg-gray-200', 'text-gray-800');
+            }
+
+            messageWrapper.appendChild(messageBubble);
+            chatContainer.appendChild(messageWrapper);
+            scrollToBottom();
+        }
+        
+        // Fungsi untuk menampilkan indikator "sedang mengetik"
+        function appendTypingIndicator() {
+            removeTypingIndicator();
+            const typingIndicator = document.createElement('div');
+            typingIndicator.id = 'typing-indicator';
+            typingIndicator.classList.add('flex', 'justify-start');
+            typingIndicator.innerHTML = `<div class="bg-gray-200 rounded-lg p-3 max-w-lg flex items-center space-x-2"><span class="text-sm text-gray-500">Bot sedang berpikir...</span><div class="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0s;"></div><div class="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0.2s;"></div><div class="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0.4s;"></div></div>`;
+            chatContainer.appendChild(typingIndicator);
+            scrollToBottom();
+        }
+
+        // Fungsi untuk menghapus indikator "sedang mengetik"
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) typingIndicator.remove();
+        }
+
+        // Fungsi untuk otomatis scroll ke bawah
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Fungsi untuk memeriksa apakah ada link video di dalam respon
+        function checkForVideoLink(text) {
+            const driveRegex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\//;
+            const match = text.match(driveRegex);
+            if (match && match[1]) {
+                displayVideo(`https://drive.google.com/file/d/${match[1]}/preview`);
+            }
+        }
+
+        // Fungsi untuk menampilkan video di dalam modal
+        function displayVideo(url) {
+            videoIframe.src = url;
+            videoModal.classList.remove('hidden');
+        }
+
+        // Fungsi untuk menutup modal video
+        function closeModal() {
+            videoIframe.src = '';
+            videoModal.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

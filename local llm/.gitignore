@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+botsspill/ # Added: Your project's virtual environment folder
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Editor-specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.Trashes
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+
+# Database and Data specific
+qdrant_data/
+RAG Knowledge/ # If this directory contains large, generated, or sensitive data not meant for version control. 
+               # If it contains source knowledge files, you might want to remove this line.
+*.db # For SQLite databases, if you use any
+*.sqlite3
+*.csv
+*.json # If these are generated data, not source code/config
+*.pkl
+*.npy
+*.npz
+*.bin
+*.pt # PyTorch models
+*.h5 # Keras/TensorFlow models
+
+# Environment variables
+.env
+.flaskenv
+
+# Docker-related (if not part of build)
+*.dockerignore

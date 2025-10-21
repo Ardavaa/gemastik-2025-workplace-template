@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Knowledge Base</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-active {
+            border-color: #8DC63F;
+            color: #8DC63F;
+            background-color: #f7fee7;
+        }
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+        .modal-content {
+             transition: transform 0.25s ease;
+        }
+        .toast {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl font-bold text-[#E5004D]">Knowledge Control</h1>
+            <p class="text-gray-500">Kelola knowledge and video tutorial SPILL HELPER.</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Kontrol Tab -->
+        <div class="mb-6 border-b border-gray-200">
+            <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                <button id="tab-knowledge" class="tab-active whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">Kelola Pengetahuan</button>
+                <button id="tab-videos" class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent">Kelola Video Tutorial</button>
+                <button id="tab-error" class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent">Error</button>
+                <button id="tab-issue" class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent">Issue</button>
+            </nav>
+        </div>
+
+        <!-- Konten Dinamis -->
+        <div id="content-area">
+            <!-- Konten akan dimuat oleh JavaScript -->
+        </div>
+    </main>
+
+    <!-- Modal untuk Form Add/Edit -->
+    <div id="form-modal" class="modal fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform -translate-y-full">
+            <div class="p-6">
+                <div class="flex justify-between items-start">
+                    <h3 id="modal-title" class="text-xl font-semibold text-gray-900">Modal Title</h3>
+                    <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600">&times;</button>
+                </div>
+                <div id="modal-body" class="mt-4">
+                    <!-- Form akan dimuat oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="toast fixed bottom-5 right-5 bg-gray-800 text-white py-3 px-5 rounded-lg shadow-lg z-50">
+        <p id="toast-message">Pesan notifikasi.</p>
+    </div>
+
+
+    <script>
+        // Konfigurasi
+        const API_BASE_URL = 'http://127.0.0.1:5000';
+
+        // Elemen DOM
+        const tabKnowledge = document.getElementById('tab-knowledge');
+        const tabVideos = document.getElementById('tab-videos');
+        const tabError = document.getElementById('tab-error');
+        const tabIssue = document.getElementById('tab-issue');
+        const contentArea = document.getElementById('content-area');
+        const modal = document.getElementById('form-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+
+        let activeTab = 'knowledge';
+        let currentEditId = null;
+
+        // --- Fungsi-fungsi ---
+
+        const showToast = (message, isError = false) => {
+            toastMessage.textContent = message;
+            toast.className = 'toast fixed bottom-5 right-5 text-white py-3 px-5 rounded-lg shadow-lg z-50'; // reset
+            toast.classList.add(isError ? 'bg-red-600' : 'bg-green-600');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+
+        const renderLoading = () => {
+            contentArea.innerHTML = `
+                <div class="flex justify-center items-center p-10">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                </div>`;
+        };
+        
+        const renderError = (message) => {
+            contentArea.innerHTML = `
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+                    <p class="font-bold">Terjadi Kesalahan</p>
+                    <p>${message}</p>
+                </div>`;
+        };
+
+        // Fungsi untuk render tabel pengetahuan
+        const renderKnowledgeTable = (data) => {
+            contentArea.innerHTML = `
+                <div class="flex justify-end mb-4">
+                    <button onclick="showModal('knowledge')" class="bg-[#8DC63F] hover:bg-[#7cb538] text-white font-bold py-2 px-4 rounded-lg">Tambah Pengetahuan</button>
+                </div>
+                <div class="overflow-x-auto bg-white rounded-lg shadow">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teks (potongan)</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="knowledge-table-body" class="bg-white divide-y divide-gray-200">
+                            ${data.map(item => `
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.title}</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-gray-500 max-w-md truncate">${item.teks.substring(0, 100)}...</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button onclick="showModal('knowledge', '${item.id_docs}')" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                        <button onclick="deleteItem('knowledge', '${item.id_docs}')" class="text-red-600 hover:text-red-900">Hapus</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        };
+
+        // Fungsi untuk render tabel video
+        const renderVideosTable = (data) => {
+             contentArea.innerHTML = `
+                <div class="flex justify-end mb-4">
+                    <button onclick="showModal('videos')" class="bg-[#8DC63F] hover:bg-[#7cb538] text-white font-bold py-2 px-4 rounded-lg">Tambah Video</button>
+                </div>
+                <div class="overflow-x-auto bg-white rounded-lg shadow">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="videos-table-body" class="bg-white divide-y divide-gray-200">
+                            ${data.map(item => `
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.title}</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-gray-500 max-w-sm truncate">${item.description}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-500"><a href="${item.link}" target="_blank" class="hover:underline">Tonton Video</a></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button onclick="showModal('videos', '${item.id}')" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                        <button onclick="deleteItem('videos', '${item.id}')" class="text-red-600 hover:text-red-900">Hapus</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        };
+
+        // Fungsi untuk render tabel error
+        const renderErrorTable = (data) => {
+            contentArea.innerHTML = `
+                <div class="overflow-x-auto bg-white rounded-lg shadow">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Error</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi Error</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="errors-table-body" class="bg-white divide-y divide-gray-200">
+                            ${data.map(item => `
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.errorName}</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-gray-500 max-w-sm truncate">${item.errorDescription}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm ${item.status === 'Handled' ? 'text-green-600' : 'text-orange-500'}">${item.status}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button onclick="showModal('error', '${item.id}')" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                        <button onclick="deleteItem('error', '${item.id}')" class="text-red-600 hover:text-red-900">Hapus</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        };
+
+        // Fungsi untuk render tabel issue
+        const renderIssueTable = (data) => {
+            contentArea.innerHTML = `
+                <div class="overflow-x-auto bg-white rounded-lg shadow">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama issue</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi issue</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="issues-table-body" class="bg-white divide-y divide-gray-200">
+                            ${data.map(item => `
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.issueName}</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-gray-500 max-w-sm truncate">${item.issueDescription}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm ${item.status === 'Handled' ? 'text-green-600' : 'text-orange-500'}">${item.status}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button onclick="showModal('issue', '${item.id}')" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                        <button onclick="deleteItem('issue', '${item.id}')" class="text-red-600 hover:text-red-900">Hapus</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        };
+
+        const loadContent = async () => {
+            renderLoading();
+            try {
+                const response = await fetch(`${API_BASE_URL}/${activeTab}`);
+                if (!response.ok) {
+                    throw new Error(`Gagal memuat data: ${response.statusText}`);
+                }
+                const data = await response.json();
+                if (activeTab === 'knowledge') {
+                    renderKnowledgeTable(data);
+                } else if(activeTab === 'videos') {
+                    renderVideosTable(data);
+                }else if(activeTab === 'error') {
+                    // TODO
+                    renderErrorTable(data);
+                }
+                else if(activeTab === 'issue') {
+                    // TODO
+                    renderIssueTable(data);
+                }
+
+            } catch (error) {
+                renderError(error.message);
+                console.error('Error loading content:', error);
+            }
+        };
+
+        const showModal = async (type, id = null) => {
+            currentEditId = id;
+            let formHtml = '';
+            let itemData = null;
+
+            if (id) {
+                // Mode Edit: Ambil data item
+                try {
+                    const response = await fetch(`${API_BASE_URL}/${type}`);
+                    const allData = await response.json();
+                    const idKey = type === 'knowledge' ? 'id_docs' : 'id'; // 'id' for videos, errors, and issues
+                    itemData = allData.find(d => d[idKey] === id);
+                } catch (error) {
+                    showToast('Gagal memuat data untuk diedit.', true);
+                    return;
+                }
+            }
+
+            if (type === 'knowledge') {
+                modalTitle.textContent = id ? 'Edit Pengetahuan' : 'Tambah Pengetahuan Baru';
+                formHtml = `
+                    <form id="knowledge-form">
+                        <div class="mb-4">
+                            <label for="title" class="block text-sm font-medium text-gray-700">Judul</label>
+                            <input type="text" name="title" id="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="${itemData?.title || ''}" required>
+                        </div>
+                        <div>
+                            <label for="text" class="block text-sm font-medium text-gray-700">Teks</label>
+                            <textarea id="text" name="text" rows="8" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>${itemData?.teks || ''}</textarea>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="button" onclick="hideModal()" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
+                            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#8DC63F] hover:bg-[#7cb538]">Simpan</button>
+                        </div>
+                    </form>`;
+            } else if (type === 'videos') {
+                modalTitle.textContent = id ? 'Edit Video' : 'Tambah Video Baru';
+                formHtml = `
+                    <form id="video-form">
+                        <div class="mb-4">
+                            <label for="title" class="block text-sm font-medium text-gray-700">Judul</label>
+                            <input type="text" name="title" id="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="${itemData?.title || ''}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                            <textarea id="description" name="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>${itemData?.description || ''}</textarea>
+                        </div>
+                        <div>
+                            <label for="link" class="block text-sm font-medium text-gray-700">URL Video</label>
+                            <input type="url" name="link" id="link" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="${itemData?.link || ''}" required>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="button" onclick="hideModal()" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
+                            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#8DC63F] hover:bg-[#7cb538]">Simpan</button>
+                        </div>
+                    </form>`;
+            } else if (type === 'error') { // Logic for 'error' type
+                modalTitle.textContent = id ? 'Edit Status Error' : 'Tambah Error Baru';
+                
+                const defaultErrorName = itemData?.errorName || '';
+                const defaultErrorDescription = itemData?.errorDescription || '';
+                const defaultStatus = itemData?.status || 'Not Handled';
+
+                formHtml = `
+                    <form id="error-form">
+                        <div class="mb-4">
+                            <label for="errorName" class="block text-sm font-medium text-gray-700">Nama Error</label>
+                            <input type="text" name="errorName" id="errorName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" value="${defaultErrorName}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="errorDescription" class="block text-sm font-medium text-gray-700">Deskripsi Error</label>
+                            <textarea id="errorDescription" name="errorDescription" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" readonly>${defaultErrorDescription}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                            <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <option value="Not Handled" ${defaultStatus === 'Not Handled' ? 'selected' : ''}>Not Handled</option>
+                                <option value="Handled" ${defaultStatus === 'Handled' ? 'selected' : ''}>Handled</option>
+                            </select>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="button" onclick="hideModal()" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
+                            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Simpan</button>
+                        </div>
+                    </form>`;
+            } else if (type === 'issue') { // NEW: Logic for 'issue' type
+                modalTitle.textContent = id ? 'Edit Status Isu' : 'Tambah Isu Baru';
+                
+                const defaultIssueName = itemData?.issueName || '';
+                const defaultIssueDescription = itemData?.issueDescription || '';
+                const defaultStatus = itemData?.status || 'Not Handled';
+
+                // Determine if fields should be readonly (when editing existing issue)
+                const isReadonly = id ? 'readonly' : '';
+                const readonlyBg = id ? 'bg-gray-100' : '';
+
+                formHtml = `
+                    <form id="issue-form">
+                        <div class="mb-4">
+                            <label for="issueName" class="block text-sm font-medium text-gray-700">Nama Isu</label>
+                            <input type="text" name="issueName" id="issueName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm ${readonlyBg}" value="${defaultIssueName}" ${isReadonly} required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="issueDescription" class="block text-sm font-medium text-gray-700">Deskripsi Isu</label>
+                            <textarea id="issueDescription" name="issueDescription" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm ${readonlyBg}" ${isReadonly} required>${defaultIssueDescription}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                            <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <option value="Not Handled" ${defaultStatus === 'Not Handled' ? 'selected' : ''}>Not Handled</option>
+                                <option value="Handled" ${defaultStatus === 'Handled' ? 'selected' : ''}>Handled</option>
+                            </select>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="button" onclick="hideModal()" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
+                            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">Simpan</button>
+                        </div>
+                    </form>`;
+            }
+
+            modalBody.innerHTML = formHtml;
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.querySelector('.modal-content').classList.remove('-translate-y-full');
+                modal.classList.remove('opacity-0');
+            }, 20);
+
+            // Add event listener for form submission
+            const form = modal.querySelector('form');
+            form.addEventListener('submit', handleFormSubmit);
+        };
+        
+        const hideModal = () => {
+            modal.querySelector('.modal-content').classList.add('-translate-y-full');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modalBody.innerHTML = '';
+                currentEditId = null;
+            }, 300);
+        };
+
+        const handleFormSubmit = async (event) => {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            const type = activeTab;
+            const url = currentEditId ? `${API_BASE_URL}/${type}/${currentEditId}` : `${API_BASE_URL}/${type}`;
+            const method = currentEditId ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || 'Terjadi kesalahan');
+                }
+                showToast(result.message || 'Operasi berhasil');
+                hideModal();
+                loadContent();
+            } catch (error) {
+                showToast(error.message, true);
+            }
+        };
+
+        const deleteItem = async (type, id) => {
+            if (!confirm('Apakah Anda yakin ingin menghapus item ini?')) {
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE_URL}/${type}/${id}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || 'Gagal menghapus item.');
+                }
+                showToast(result.message || 'Item berhasil dihapus.');
+                loadContent();
+            } catch (error) {
+                showToast(error.message, true);
+            }
+        };
+
+        // --- Event Listeners ---
+        // Listener for the Knowledge tab
+        tabKnowledge.addEventListener('click', () => {
+            activeTab = 'knowledge';
+            tabKnowledge.classList.add('tab-active');
+            tabVideos.classList.remove('tab-active');
+            tabError.classList.remove('tab-active');
+            tabIssue.classList.remove('tab-active'); // NEW: Deactivate Issue tab
+            loadContent();
+        });
+
+        // Listener for the Videos tab
+        tabVideos.addEventListener('click', () => {
+            activeTab = 'videos';
+            tabVideos.classList.add('tab-active');
+            tabKnowledge.classList.remove('tab-active');
+            tabError.classList.remove('tab-active');
+            tabIssue.classList.remove('tab-active'); // NEW: Deactivate Issue tab
+            loadContent();
+        });
+
+        // Listener for the Error tab
+        tabError.addEventListener('click', () => {
+            activeTab = 'error';
+            tabError.classList.add('tab-active');
+            tabKnowledge.classList.remove('tab-active');
+            tabVideos.classList.remove('tab-active');
+            tabIssue.classList.remove('tab-active'); // NEW: Deactivate Issue tab
+            loadContent();
+        });
+
+        // NEW: Listener for the Issue tab
+        tabIssue.addEventListener('click', () => {
+            activeTab = 'issue'; // Set activeTab to 'issue'
+            tabIssue.classList.add('tab-active'); // Activate Issue tab
+            tabKnowledge.classList.remove('tab-active'); // Deactivate Knowledge
+            tabVideos.classList.remove('tab-active');   // Deactivate Videos
+            tabError.classList.remove('tab-active');    // Deactivate Error
+            loadContent();
+        });
+        
+        closeModalBtn.addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', loadContent);
+    </script>
+</body>
+</html>

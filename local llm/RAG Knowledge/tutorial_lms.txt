@@ -1,0 +1,82 @@
+
+TUTORIAL LENGKAP PENGGUNAAN LMS (LEARNING MANAGEMENT SYSTEM)
+==============================================================
+
+
+1. LOGIN KE LMS
+------------------
+1. Kunjungi situs LMS institusi (contoh: https://lms.namauniversitas.ac.id)
+2. Masukkan:
+   - Username atau email kampus
+   - Password yang diberikan/dibuat
+3. Klik “Login” atau “Masuk”
+
+2. MENGAKSES KELAS
+---------------------
+1. Setelah login, kamu akan melihat dashboard dengan daftar kelas.
+2. Klik nama kelas yang ingin diakses.
+3. Kamu akan masuk ke halaman utama kelas tersebut.
+
+3. MENGUNDUH MATERI
+----------------------
+1. Masuk ke salah satu topik/pertemuan di dalam kelas.
+2. Cari file (PDF, PPT, DOC, Video, dll)
+3. Klik nama file untuk mengunduh
+
+4. MENGUMPULKAN TUGAS
+------------------------
+1. Klik bagian “Tugas” atau “Assignment”
+2. Pilih tugas yang ingin dikumpulkan
+3. Baca instruksi dan tenggat waktu
+4. Klik “Tambah Tugas” atau “Unggah File”
+5. Upload file dari perangkat kamu (PDF/DOC/PPT)
+6. Klik “Kumpulkan” atau “Submit Assignment”
+
+5. MENGIKUTI KUIS / UJIAN ONLINE
+----------------------------------
+1. Klik bagian “Kuis”, “Tes”, atau “Ujian”
+2. Pilih sesi ujian yang aktif
+3. Klik “Mulai” atau “Start Quiz”
+4. Jawab soal sesuai instruksi
+5. Klik “Kirim” atau “Submit” saat selesai
+
+6. MELIHAT NILAI
+------------------
+1. Masuk ke halaman kelas
+2. Klik tab “Nilai” atau “Grades”
+3. Kamu bisa melihat nilai untuk tugas, kuis, dan partisipasi
+
+7. BERDISKUSI DENGAN DOSEN/MAHASISWA
+--------------------------------------
+1. Masuk ke bagian “Forum Diskusi” atau “Diskusi”
+2. Klik topik diskusi
+3. Balas atau buat topik baru
+4. Gunakan bahasa sopan dan sesuai etika akademik
+
+8. MENGATUR PROFIL
+---------------------
+1. Klik nama kamu atau ikon profil
+2. Masuk ke “Edit Profil”
+3. Ubah nama tampilan, foto, dan informasi pribadi
+4. Simpan perubahan
+
+9. PENGATURAN NOTIFIKASI
+--------------------------
+1. Buka menu “Setelan” atau “Pengaturan”
+2. Masuk ke bagian “Notifikasi”
+3. Atur notifikasi email, pop-up, atau aplikasi sesuai kebutuhan
+
+10. LMS DI HP (JIKA TERSEDIA)
+-------------------------------
+1. Unduh aplikasi LMS resmi (misalnya: Moodle App, Canvas Student)
+2. Login menggunakan akun LMS kamu
+3. Akses materi, tugas, kuis, dan diskusi langsung dari HP
+
+11. TIPS TAMBAHAN
+-------------------
+- Selalu cek deadline tugas & kuis
+- Gunakan browser terbaru untuk kenyamanan
+- Simpan bukti pengumpulan tugas (screenshot/email notifikasi)
+- Aktifkan notifikasi agar tidak ketinggalan pengumuman
+
+Selesai! Dengan panduan ini, kamu bisa memanfaatkan LMS dengan lebih maksimal untuk kegiatan belajar daring.
