@@ -252,3 +252,5 @@ xgboost==3.0.5
 xxhash==3.5.0
 yarl==1.20.1
 zstandard==0.23.0
+albumentations==0.4.3
+
