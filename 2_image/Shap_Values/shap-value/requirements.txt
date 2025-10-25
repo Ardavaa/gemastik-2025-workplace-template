@@ -1,0 +1,21 @@
+# SHAP will install several other packages, including Pandas
+# Do not specify versions for those packages here to avoid conflicts with the version SHAP uses
+shap==0.*
+
+# TensorFlow commented out because we are using the PyTorch examples (see README)
+# tensorflow==2.4.*
+# Tensorflow will also install NumPy, picking a compatible version
+#numpy==
+# tensorflow_datasets==4.*
+
+torch==2.0.*
+torchvision==0.15.*
+
+jupyterlab==4.0.*
+ipywidgets==8.0.*
+matplotlib==3.7.*
+
+# linters
+autopep8
+pydocstyle
+flake8
